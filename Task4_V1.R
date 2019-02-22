@@ -7,7 +7,6 @@
 
 
 
-
 # Libraries ---------------------------------------------------------------
 
 library(arules)
@@ -21,25 +20,33 @@ library(caret)
 
 BasketData <- read.transactions("C:/Users/T450S/Desktop/Floriana/Ubiqum/Data Analytics II/Task 4/ElectronidexTransactions2017.csv",
                           format = "basket", sep=";", 
-                          skip = 1)
+                          rm.duplicates = TRUE)
 
 
 # Get to know the dataset -------------------------------------------------
 # Summary is the most useful #
 
-inspect(BasketData)
+inspect(BasketData) #no
 
 length(BasketData)
 
-size(BasketData)
+size(BasketData) #no
 
-LIST(BasketData)
+LIST(BasketData) #no
 
 itemLabels(BasketData)
 
 summary(BasketData)
 
-str(BasketData)
+str(BasketData) #no
+
+
+# Transactions with 1 product ---------------------------------------------
+
+products_1item <- BasketData[which(size(BasketData) == 1), ]
+crosstable <- crossTable(products_1item)
+crosstable[10:14, 10:14]  #no
+itemFrequencyPlot(products_1item, topN = 10, type = "absolute")
 
 
 # Visualization -----------------------------------------------------------
@@ -49,13 +56,13 @@ itemFrequencyPlot(BasketData,topN=20,type="absolute")
 
 itemFrequencyPlot(BasketData,topN=20,type="relative")
 
-image(BasketData[1:100])
+image(BasketData[1:100]) #no
 
-image(BasketData[1:50])
+image(BasketData[1:50]) #no
 
-image(sample(BasketData, 25))
+image(sample(BasketData, 25)) #no
 
-image(BasketData[1:200])
+image(BasketData[1:200]) #no
 
 
 # How many different items, customers buy the most ------------------------
@@ -69,7 +76,7 @@ items_freq = data.frame(Distinct_Items = c(1:30),
 
 ggplot(items_freq, aes(x = Distinct_Items, y = Frequency)) +
   theme_bw() + 
-  geom_bar(stat="identity", color = "black", fill = "red") + 
+  geom_bar(stat="identity", color = "black", fill = "orange") + 
   labs(y = "Frequency",
        x = "Distinct items bought in transaction",
        title = "Frequency of transactions with number of distinct items")
@@ -89,28 +96,28 @@ print(result)
 
 # Apriori algorithm -------------------------------------------------------
 
-rules <- apriori(BasketData, parameter = list(supp = 0.1, conf = 0.8, minlen = 2))
+#1
+rules1 <- apriori(BasketData, parameter = list(supp = 0.01, conf = 0.5, minlen = 2))
+inspect(sort(rules1, decreasing = TRUE, by = "lift") [1:19])
+inspect(sort(rules1, decreasing = TRUE, by = "confidence") [1:19])
+summary(rules1)
+is.redundant(rules1)
 
-rules <- apriori(BasketData, parameter = list(supp = 0.001, conf = 0.80))
+#2
+rules2 <- apriori(BasketData, parameter = list(supp = 0.02, conf = 0.3, minlen = 2))
+inspect(sort(rules2, decreasing = TRUE, by = "lift") [1:20])
+summary(rules2)
+is.redundant(rules2)
 
-rules <- apriori(BasketData, parameter = list(supp = 0.005, conf = 0.7, minlen = 2))
-inspect(rules)
-summary(rules)
-inspect(sort(rules, decreasing = TRUE, by = "support"))
-inspect(sort(rules, decreasing = TRUE, by = "confidence"))
+#3
+rules3 <- apriori(BasketData, parameter = list(supp = 0.03, conf = 0.3, minlen = 2))
+inspect(sort(rules3, decreasing = TRUE, by = "confidence"))
+summary(rules3)
+is.redundant(rules3)
 
-is.redundant(rules)
+#4
+rules4 <- apriori(BasketData, parameter = list(supp = 0.01, conf = 0.001, minlen = 3))
+inspect(sort(rules4, decreasing = TRUE, by = "lift") [1:20])
+summary(rules4)
+is.redundant(rules4)
 
-
-# Rules per product -------------------------------------------------------
-
-rules3 <- apriori(BasketData, 
-                  parameter = list(support = 0.004
-                                   ,confidence = 0.4)) 
-
-inspect(rules3)
-
-Earpod <- subset(rules3, items %in% "Apple Earpods")
-inspect(sort(Earpod, by="lift"))
-
-plot(Earpod, method="paracoord", control=list(reorder=TRUE))
