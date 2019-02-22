@@ -60,7 +60,7 @@ items_freq = data.frame(Distinct_Items = c(1:15),
 
 ggplot(items_freq, aes(x = Distinct_Items, y = Frequency)) +
   theme_bw() + 
-  geom_bar(stat="identity", color = "black", fill = "green") + 
+  geom_bar(stat="identity", color = "black", fill = "orange") + 
   labs(y = "Frequency",
        x = "Distinct items",
        title = "Composition of baskets by distinct items")
@@ -82,17 +82,12 @@ print(result)
 
 ruleExplorer(BasketDataList)
 
-# Support 1
-rules1Sup <- apriori(BasketDataList, parameter = list(supp = 0.01, conf = 0.80, minlen = 2))
-
+# Support 1 #usa questa regola
+rules1Sup <- apriori(BasketDataList, parameter = list(supp = 0.01, conf = 0.50, minlen = 2, maxlen = 2))
 inspect(rules1Sup)
-
 summary(rules1Sup)
-
 inspect(sort(rules1Sup, decreasing = TRUE, by = "lift")[1:20])
-
 inspect(sort(rules1Sup, decreasing = TRUE, by = "support")[1:10])
-
 is.redundant(rules1Sup)
 
 plot(rules1Sup[1:5], method="paracoord", control=list(reorder=TRUE)) #non capisco
@@ -103,16 +98,16 @@ plot(rules1Sup[1:5], method="grouped", measure="support")
 plot(rules1Sup, measure = c("support", "lift"), shading = "confidence") #si
 plot(rules1Sup, method = "two-key plot") #no
 
-# Support 2
-rules2Sup <- apriori(BasketDataList, parameter = list(supp = 0.02, conf = 0.75, minlen = 2))
+# Support 2 # usa questa regola
+rules2Sup <- apriori(BasketDataList, parameter = list(supp = 0.02, conf = 0.50, minlen = 2))
 
 inspect(rules2Sup)
 summary(rules2Sup)
-inspect(sort(rules2Sup, decreasing = TRUE, by = "lift")[1:28])
+inspect(sort(rules2Sup, decreasing = TRUE, by = "lift")[1:20])
 is.redundant(rules2Sup)
 
 # Support 3
-rules3Sup <- apriori(BasketDataList, parameter = list(supp = 0.03, conf = 0.70, minlen = 2))
+rules3Sup <- apriori(BasketDataList, parameter = list(supp = 0.03, conf = 0.001, minlen = 2, maxlen = 2))
 
 inspect(rules3Sup)
 summary(rules3Sup)
@@ -120,14 +115,6 @@ inspect(sort(rules3Sup, decreasing = TRUE, by = "lift")[1:20])
 is.redundant(rules3Sup)
 
 plot(rules3Sup, measure=c("support", "confidence"), shading="lift", engine = "interactive")
-
-# Support 4
-rules4Sup <- apriori(BasketDataList, parameter = list(supp = 800/9832, conf = 0.001, minlen = 2))
-
-inspect(rules4Sup)
-inspect(sort(rules4Sup, decreasing = TRUE, by = "lift")[1:10])
-summary(rules4Sup)
-is.redundant(rules4Sup)
 
 
 # Rules per product -------------------------------------------------------
