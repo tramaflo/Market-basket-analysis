@@ -26,43 +26,28 @@ BasketData <- read.transactions("C:/Users/T450S/Desktop/Floriana/Ubiqum/Data Ana
 # Get to know the dataset -------------------------------------------------
 # Summary is the most useful #
 
-inspect(BasketData) #no
-
-length(BasketData)
-
-size(BasketData) #no
-
-LIST(BasketData) #no
+size(BasketData)
 
 itemLabels(BasketData)
 
 summary(BasketData)
 
-str(BasketData) #no
-
 
 # Transactions with 1 product ---------------------------------------------
 
 products_1item <- BasketData[which(size(BasketData) == 1), ]
+
 crosstable <- crossTable(products_1item)
-crosstable[10:14, 10:14]  #no
+
 itemFrequencyPlot(products_1item, topN = 10, type = "absolute")
 
 
-# Visualization -----------------------------------------------------------
-# Different ways to plot the same result #
 
-itemFrequencyPlot(BasketData,topN=20,type="absolute")
+# Products frequency ------------------------------------------------------
 
-itemFrequencyPlot(BasketData,topN=20,type="relative")
+itemFrequencyPlot(BasketData,topN=10,type="absolute")
 
-image(BasketData[1:100]) #no
-
-image(BasketData[1:50]) #no
-
-image(sample(BasketData, 25)) #no
-
-image(BasketData[1:200]) #no
+itemFrequencyPlot(BasketData,topN=10,type="relative")
 
 
 # How many different items, customers buy the most ------------------------
@@ -85,12 +70,14 @@ ggplot(items_freq, aes(x = Distinct_Items, y = Frequency)) +
 # Mode --------------------------------------------------------------------
 
 sizes <- size(BasketData)
+
 Mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
 }
 
 result <- Mode(sizes)
+
 print(result)
 
 
@@ -116,7 +103,7 @@ summary(rules3)
 is.redundant(rules3)
 
 #4
-rules4 <- apriori(BasketData, parameter = list(supp = 0.01, conf = 0.001, minlen = 3))
+rules4 <- apriori(BasketData, parameter = list(supp = 0.01, conf = 0.2, minlen = 3))
 inspect(sort(rules4, decreasing = TRUE, by = "lift") [1:20])
 summary(rules4)
 is.redundant(rules4)

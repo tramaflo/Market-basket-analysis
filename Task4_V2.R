@@ -36,17 +36,24 @@ BasketDataList <- aggregate(BasketDataList, by = BasketDataList@itemInfo$labels)
 
 
 # Get to know the dataset -------------------------------------------------
-# Summary is the most useful #
 
 itemLabels(BasketDataList)
 
 summary(BasketDataList)
 
 
-# Visualization -----------------------------------------------------------
-# Different ways to plot the same result #
+# Transactions with 1 category --------------------------------------------
 
-itemFrequencyPlot(BasketDataList,topN=15,type="absolute")
+categories_1cat <- BasketDataList[which(size(BasketDataList) == 1), ]
+
+crosstable <- crossTable(categories_1cat)
+
+itemFrequencyPlot(categories_1cat, topN = 10, type = "absolute")
+
+
+# Categories frequency ----------------------------------------------------
+
+itemFrequencyPlot(BasketDataList,topN=10,type="absolute")
 
 itemFrequencyPlot(BasketDataList,topN=15,type="relative")
 
@@ -69,12 +76,14 @@ ggplot(items_freq, aes(x = Distinct_Items, y = Frequency)) +
 # Mode --------------------------------------------------------------------
 
 sizes <- size(BasketDataList)
+
 Mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
 }
 
 result <- Mode(sizes)
+
 print(result)
 
 
@@ -84,47 +93,30 @@ ruleExplorer(BasketDataList)
 
 # Support 1 #usa questa regola
 rules1Sup <- apriori(BasketDataList, parameter = list(supp = 0.01, conf = 0.50, minlen = 2, maxlen = 2))
-inspect(rules1Sup)
 summary(rules1Sup)
 inspect(sort(rules1Sup, decreasing = TRUE, by = "lift")[1:20])
 inspect(sort(rules1Sup, decreasing = TRUE, by = "support")[1:10])
 is.redundant(rules1Sup)
 
-plot(rules1Sup[1:5], method="paracoord", control=list(reorder=TRUE)) #non capisco
-plot(rules1Sup, measure=c("support", "confidence"), shading="lift", engine = "interactive") #si
-plot(rules1Sup, method="graph",interactive=FALSE,shading="lift") #no
-plot(rules1Sup[1:5], method = "graph", control =list(type(Laptops))) #non funziona
-plot(rules1Sup[1:5], method="grouped", measure="support")
-plot(rules1Sup, measure = c("support", "lift"), shading = "confidence") #si
-plot(rules1Sup, method = "two-key plot") #no
 
 # Support 2 # usa questa regola
 rules2Sup <- apriori(BasketDataList, parameter = list(supp = 0.02, conf = 0.50, minlen = 2))
-
-inspect(rules2Sup)
 summary(rules2Sup)
 inspect(sort(rules2Sup, decreasing = TRUE, by = "lift")[1:20])
 is.redundant(rules2Sup)
 
 # Support 3
 rules3Sup <- apriori(BasketDataList, parameter = list(supp = 0.03, conf = 0.001, minlen = 2, maxlen = 2))
-
-inspect(rules3Sup)
 summary(rules3Sup)
 inspect(sort(rules3Sup, decreasing = TRUE, by = "lift")[1:20])
 is.redundant(rules3Sup)
 
+
+# Rules Visualization -----------------------------------------------------
+
+plot(rules1Sup[1:5], method="paracoord", control=list(reorder=TRUE))
+plot(rules1Sup, measure=c("support", "confidence"), shading="lift", engine = "interactive")
+plot(rules1Sup[1:5], method="grouped", measure="support")
+plot(rules1Sup, measure = c("support", "lift"), shading = "confidence")
 plot(rules3Sup, measure=c("support", "confidence"), shading="lift", engine = "interactive")
-
-
-# Rules per product -------------------------------------------------------
-
-rulesAppleEarpods <- apriori(BasketData, 
-                  parameter = list(support = 0.004
-                                   ,confidence = 0.4))
-
-inspect(rulesAppleEarpods)
-
-Earpod <- subset(rulesAppleEarpods, items %in% "Apple Earpods")
-inspect(sort(Earpod, by="lift"))
 
